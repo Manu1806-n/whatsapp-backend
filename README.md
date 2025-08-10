@@ -54,7 +54,7 @@ whatsapp-backend/
 ## 📦 Installation & Local Run
 ```bash
 # Clone repo
-git clone https://github.com/your-username/whatsapp-backend.git
+git clone https://github.com/Manu1806-n/whatsapp-backend.git
 cd whatsapp-backend
 
 # Install dependencies
