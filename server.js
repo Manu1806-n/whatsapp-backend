@@ -10,14 +10,25 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",") // Allow multiple origins if comma-separated
+  : ["http://localhost:3000"]; // default for local dev
+
+// Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN || "*",
-    methods: ["GET", "POST", "DELETE", "PATCH"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "DELETE", "PATCH"],
+    credentials: true
   }
 });
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || "*" }));
+// Express CORS middleware
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 
 // MongoDB
@@ -81,13 +92,16 @@ app.delete("/api/messages/:id", async (req, res) => {
   }
 });
 
-/* ========== Socket.IO Connection ========== */
+// Socket.IO Connection
 io.on("connection", (socket) => {
   console.log(`🔌 Socket connected: ${socket.id}`);
   socket.on("disconnect", () => {
     console.log(`❌ Socket disconnected: ${socket.id}`);
   });
 });
+
+// Store io instance for routes if needed
+app.set("io", io);
 
 const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
